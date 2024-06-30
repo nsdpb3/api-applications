@@ -1,4 +1,3 @@
-FROM ubuntu:latest
-LABEL authors="viktor"
+FROM nginx:latest
 
-ENTRYPOINT ["top", "-b"]
+COPY default.conf /etc/nginx/conf.d/default.conf
