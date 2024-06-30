@@ -38,3 +38,5 @@ check_composer_json:
 		mv temp_symfony_project/* temp_symfony_project/.* . 2>/dev/null || true; \
 		rmdir temp_symfony_project; \
 	fi
+console:
+	docker-compose exec $(PHP_SERVICE) sh
