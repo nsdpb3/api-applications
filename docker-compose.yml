@@ -10,28 +10,45 @@ services:
       - .:/var/www/html
     depends_on:
       - php
+    networks:
+      - backend
 
   php:
     build:
       context: ./docker/php
     volumes:
       - .:/var/www/html
+    networks:
+      - backend
 
-  postgres:
-    image: postgres:latest
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
-      POSTGRES_DB: symfony
-      POSTGRES_USER: symfony
-      POSTGRES_PASSWORD: symfony
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data:rw
+    networks:
+      - backend
 
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
+    networks:
+      - backend
 
 volumes:
   postgres_data:
+
+networks:
+  backend:
+    driver: bridge
